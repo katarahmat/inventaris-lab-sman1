@@ -32,7 +32,11 @@ export default function DashboardView({ devices, onSelectDevice, onNavigateToTab
   const laptopsUsable = laptops.filter(d => d.kondisi === 'Baik').length;
   const laptopsBroken = laptops.filter(d => d.kondisi !== 'Baik').length;
   
-  const desktopsCount = devices.filter(d => d.jenisPerangkat === 'Komputer Desktop').length;
+  const desktops = devices.filter(d => d.jenisPerangkat === 'Komputer Desktop');
+  const desktopsUsable = desktops.filter(d => d.kondisi === 'Baik').length;
+  const desktopsBroken = desktops.filter(d => d.kondisi !== 'Baik').length;
+
+  const desktopsCount = desktops.length;
   const networkCount = devices.filter(d => d.jenisPerangkat === 'Perangkat Jaringan').length;
   const ifpCount = devices.filter(d => d.jenisPerangkat === 'Interactive Flat Panel (IFP)').length;
 
@@ -85,8 +89,55 @@ export default function DashboardView({ devices, onSelectDevice, onNavigateToTab
           </span>
           <h2 className="text-2xl md:text-3xl font-black tracking-tight mt-1">Sistem Inventaris Laboratorium Informatika</h2>
           <p className="text-indigo-100 text-sm font-medium">
-            Selamat datang di panel admin utama. Kelola data perangkat, catat status perbaikan dan pemeliharaan laboratorium komputer SMAN 1 Teluk Kuantan secara efisien.
+            Selamat datang di panel utama. Kelola data perangkat, catat status perbaikan dan pemeliharaan laboratorium komputer SMAN 1 Teluk Kuantan secara efisien.
           </p>
+        </div>
+      </div>
+
+      {/* Quick Summary Section for Principal (Kepala Sekolah) */}
+      <div className="bg-white p-5 rounded-2xl border-2 border-emerald-150 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div>
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+              <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse inline-block"></span>
+              Status Kesiapan Laboratorium (Kunjungan Kepala Sekolah)
+            </h3>
+            <p className="text-[10px] text-slate-400">Ringkasan cepat ketersediaan workstation komputer siap pakai & laptop yang butuh perbaikan.</p>
+          </div>
+          <span className="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-150 px-2.5 py-1 rounded-md self-start sm:self-auto">
+            Update Terkini: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          {/* Card 1: Komputer desktop yang bisa digunakan */}
+          <div className="bg-emerald-50/50 border border-emerald-150 p-4 rounded-xl flex items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest block">KOMPUTER YANG BISA DIGUNAKAN</span>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Sebanyak <strong className="text-emerald-700 font-extrabold">{desktopsUsable} unit</strong> Komputer Desktop berada dalam kondisi <strong className="text-emerald-700 font-bold">Baik/Layak</strong> dan siap dipakai penuh untuk praktek siswa di labor.
+              </p>
+            </div>
+            <div className="text-center shrink-0 min-w-[75px] bg-white border border-emerald-200 px-3 py-2.5 rounded-xl shadow-xs">
+              <span className="block text-3xl font-black text-emerald-600 leading-none">{desktopsUsable}</span>
+              <span className="text-[8px] text-slate-400 font-extrabold uppercase mt-1 block tracking-wider">UNIT SIAP</span>
+            </div>
+          </div>
+          
+          {/* Card 2: Laptop yang rusak */}
+          <div className="bg-rose-50/50 border border-rose-150 p-4 rounded-xl flex items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-[10px] font-black text-rose-700 uppercase tracking-widest block">LAPTOP YANG RUSAK</span>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Terdapat <strong className="text-rose-700 font-extrabold">{laptopsBroken} unit</strong> Laptop terdeteksi <strong className="text-rose-700 font-bold">Rusak</strong> dan membutuhkan perbaikan/pemeliharaan berkala.
+              </p>
+            </div>
+            <div className="text-center shrink-0 min-w-[75px] bg-white border border-rose-200 px-3 py-2.5 rounded-xl shadow-xs">
+              <span className="block text-3xl font-black text-rose-600 leading-none">{laptopsBroken}</span>
+              <span className="text-[8px] text-slate-400 font-extrabold uppercase mt-1 block tracking-wider">UNIT RUSAK</span>
+            </div>
+          </div>
+          
         </div>
       </div>
 

@@ -61,24 +61,32 @@ export default function Header({
       {/* Right side: Role Quick Switch, Notification Bell, User profile */}
       <div className="flex items-center gap-4">
         
-        {/* Role Quick Switcher */}
-        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
-          <span className="hidden xl:inline text-[10px] font-bold text-slate-500 uppercase px-2">
-            Akses Akun:
-          </span>
-          <select
-            id="role-switcher-select"
-            value={currentUserRole}
-            onChange={(e) => {
-              setCurrentUserRole(e.target.value as UserRole);
-            }}
-            className="text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-lg py-1 px-2.5 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer"
-          >
-            <option value="Administrator">Administrator (Rahmat)</option>
-            <option value="Teknisi Labor">Teknisi Labor (Hendra)</option>
-            <option value="Kepala Labor">Kepala Labor (Pak Siswo)</option>
-          </select>
-        </div>
+        {/* Role Quick Switcher / Guest Mode Indicator */}
+        {currentUserRole === 'Tamu' ? (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-650">
+            <Shield className="w-3.5 h-3.5 text-slate-500" />
+            <span className="hidden xs:inline">Mode Publik (Akses Baca)</span>
+            <span className="xs:hidden">Publik</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <span className="hidden xl:inline text-[10px] font-bold text-slate-500 uppercase px-2">
+              Akses Akun:
+            </span>
+            <select
+              id="role-switcher-select"
+              value={currentUserRole}
+              onChange={(e) => {
+                setCurrentUserRole(e.target.value as UserRole);
+              }}
+              className="text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-lg py-1 px-2.5 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer"
+            >
+              <option value="Administrator">Administrator (Rahmat)</option>
+              <option value="Teknisi Labor">Teknisi Labor (Hendra)</option>
+              <option value="Kepala Labor">Kepala Labor (Pak Siswo)</option>
+            </select>
+          </div>
+        )}
 
         {/* Notification Bell Dropdown */}
         <div className="relative">

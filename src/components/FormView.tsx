@@ -10,7 +10,7 @@ interface FormViewProps {
   rooms: LabRoom[];
 }
 
-const CATEGORY_PRESETS: Record<DeviceType, string[]> = {
+const CATEGORY_PRESETS: Record<string, string[]> = {
   'Laptop': [
     'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400&auto=format&fit=crop&q=60',
     'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=400&auto=format&fit=crop&q=60',
@@ -33,6 +33,23 @@ const CATEGORY_PRESETS: Record<DeviceType, string[]> = {
 
 export default function FormView({ editDevice, onSaveDevice, onCancelEdit, rooms }: FormViewProps) {
   
+  // List of available device types (persisted in localStorage)
+  const [deviceTypes, setDeviceTypes] = useState<string[]>(() => {
+    const local = localStorage.getItem('inv_custom_device_types');
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return ['Laptop', 'Komputer Desktop', 'Interactive Flat Panel (IFP)', 'Perangkat Jaringan'];
+  });
+
+  const [isAddingNewType, setIsAddingNewType] = useState(false);
+  const [newTypeName, setNewTypeName] = useState('');
+
   // Local Form state fields
   const [kodeInventaris, setKodeInventaris] = useState('');
   const [namaPerangkat, setNamaPerangkat] = useState('');
@@ -58,6 +75,14 @@ export default function FormView({ editDevice, onSaveDevice, onCancelEdit, rooms
     if (editDevice) {
       setKodeInventaris(editDevice.kodeInventaris);
       setNamaPerangkat(editDevice.namaPerangkat);
+      
+      // Auto-append dynamic types if they are missing from list
+      if (editDevice.jenisPerangkat && !deviceTypes.includes(editDevice.jenisPerangkat)) {
+        const updated = [...deviceTypes, editDevice.jenisPerangkat];
+        setDeviceTypes(updated);
+        localStorage.setItem('inv_custom_device_types', JSON.stringify(updated));
+      }
+
       setJenisPerangkat(editDevice.jenisPerangkat);
       setMerk(editDevice.merk);
       setTipeModel(editDevice.tipeModel);
@@ -82,12 +107,13 @@ export default function FormView({ editDevice, onSaveDevice, onCancelEdit, rooms
 
   // Handle auto-generation of inventory codes
   const generateKodeInventaris = () => {
+    const customAbbr = jenisPerangkat ? jenisPerangkat.replace(/[^a-zA-Z]/g, '').substring(0, 3).toUpperCase() : 'EQP';
     const typeAbbr = {
       'Laptop': 'LPT',
       'Komputer Desktop': 'PC',
       'Interactive Flat Panel (IFP)': 'IFP',
       'Perangkat Jaringan': 'NET'
-    }[jenisPerangkat];
+    }[jenisPerangkat] || (customAbbr || 'EQP');
 
     const roomIndex = rooms.findIndex(r => r.nama === lokasiRuangan) + 1;
     const roomCode = roomIndex > 0 ? `LAB-0${roomIndex}` : 'LAB-01';
@@ -105,6 +131,8 @@ export default function FormView({ editDevice, onSaveDevice, onCancelEdit, rooms
       const presets = CATEGORY_PRESETS[jenisPerangkat];
       if (presets && presets.length > 0) {
         setFotoPerangkat(presets[0]);
+      } else {
+        setFotoPerangkat('https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400&auto=format&fit=crop&q=60');
       }
     }
   }, [jenisPerangkat, lokasiRuangan, tahunPembuatan]);
@@ -226,18 +254,70 @@ export default function FormView({ editDevice, onSaveDevice, onCancelEdit, rooms
 
             {/* Jenis Perangkat */}
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Jenis Perangkat</label>
-              <select
-                value={jenisPerangkat}
-                onChange={(e) => setJenisPerangkat(e.target.value as DeviceType)}
-                className="w-full rounded-xl border border-slate-200 p-2.5 focus:outline-none focus:border-blue-500 bg-slate-50/50 cursor-pointer"
-                disabled={!!editDevice} // Disable type changes on edit
-              >
-                <option value="Laptop">Laptop</option>
-                <option value="Komputer Desktop">Komputer Desktop</option>
-                <option value="Interactive Flat Panel (IFP)">Interactive Flat Panel (IFP)</option>
-                <option value="Perangkat Jaringan">Perangkat Jaringan</option>
-              </select>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block font-bold text-slate-700">Jenis Perangkat</label>
+                {!editDevice && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddingNewType(prev => !prev);
+                      setNewTypeName('');
+                    }}
+                    className="text-[10px] text-blue-600 hover:text-blue-700 font-extrabold flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded-md hover:bg-blue-100 transition-all"
+                  >
+                    {isAddingNewType ? 'Pilih List' : '+ Tambah Baru'}
+                  </button>
+                )}
+              </div>
+              
+              {isAddingNewType ? (
+                <div className="flex gap-1.5 animate-in slide-in-from-top-1 duration-150">
+                  <input
+                    type="text"
+                    placeholder="Masukkan jenis baru (e.g. Printer, Projector)"
+                    value={newTypeName}
+                    onChange={(e) => setNewTypeName(e.target.value)}
+                    className="flex-1 rounded-xl border border-blue-200 p-2 focus:outline-none focus:border-blue-500 bg-blue-50/10 font-semibold text-slate-800"
+                    required
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const trimmed = newTypeName.trim();
+                      if (!trimmed) {
+                        alert('Mohon ketikkan nama jenis perangkat baru');
+                        return;
+                      }
+                      // Normalise check
+                      if (deviceTypes.some(t => t.toLowerCase() === trimmed.toLowerCase())) {
+                        alert('Jenis perangkat ini sudah ada di dalam pilihan!');
+                        return;
+                      }
+                      const updated = [...deviceTypes, trimmed];
+                      setDeviceTypes(updated);
+                      localStorage.setItem('inv_custom_device_types', JSON.stringify(updated));
+                      setJenisPerangkat(trimmed);
+                      setNewTypeName('');
+                      setIsAddingNewType(false);
+                    }}
+                    className="px-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl shadow-xs transition-all text-[11px]"
+                  >
+                    Simpan
+                  </button>
+                </div>
+              ) : (
+                <select
+                  value={jenisPerangkat}
+                  onChange={(e) => setJenisPerangkat(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 p-2.5 focus:outline-none focus:border-blue-500 bg-slate-50/50 cursor-pointer font-medium"
+                  disabled={!!editDevice} // Disable type changes on edit
+                >
+                  {deviceTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              )}
             </div>
 
             {/* Kode Inventaris */}

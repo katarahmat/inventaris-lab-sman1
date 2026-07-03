@@ -1,8 +1,8 @@
-export type DeviceType = 'Laptop' | 'Komputer Desktop' | 'Interactive Flat Panel (IFP)' | 'Perangkat Jaringan';
+export type DeviceType = string;
 
 export type DeviceCondition = 'Baik' | 'Rusak Ringan' | 'Rusak Berat';
 
-export type UserRole = 'Administrator' | 'Teknisi Labor' | 'Kepala Labor';
+export type UserRole = 'Administrator' | 'Teknisi Labor' | 'Kepala Labor' | 'Tamu';
 
 export type RepairStatus = 'Pending' | 'Dalam Proses' | 'Selesai';
 

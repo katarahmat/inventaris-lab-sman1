@@ -34,6 +34,8 @@ export default function App() {
   });
   
   const [currentUserRole, setCurrentUserRole] = useState<UserRole>(() => {
+    const logged = localStorage.getItem('inv_logged_in') === 'true';
+    if (!logged) return 'Tamu';
     return (localStorage.getItem('inv_user_role') as UserRole) || 'Administrator';
   });
 
@@ -60,7 +62,7 @@ export default function App() {
 
   const [rooms] = useState(INITIAL_ROOMS);
 
-  // Active view tab state
+  // Active view tab state - default is dashboard
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   
   // Active editing device
@@ -117,12 +119,15 @@ export default function App() {
     if (formattedUsername === 'admin' && password === 'admin123') {
       setCurrentUserRole('Administrator');
       setIsLoggedIn(true);
+      setActiveTab('dashboard');
     } else if (formattedUsername === 'teknisi' && password === 'teknisi123') {
       setCurrentUserRole('Teknisi Labor');
       setIsLoggedIn(true);
+      setActiveTab('dashboard');
     } else if (formattedUsername === 'kepalalab' && password === 'kepalalab123') {
       setCurrentUserRole('Kepala Labor');
       setIsLoggedIn(true);
+      setActiveTab('dashboard');
     } else {
       setLoginError('Username atau password yang Anda masukkan salah!');
     }
@@ -131,6 +136,7 @@ export default function App() {
   const handleQuickLogin = (role: UserRole) => {
     setCurrentUserRole(role);
     setIsLoggedIn(true);
+    setActiveTab('dashboard');
     
     // Push an access alert to notifications
     const newNotif: AppNotification = {
@@ -146,6 +152,7 @@ export default function App() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setCurrentUserRole('Tamu');
     setUsername('');
     setPassword('');
     setEditDevice(null);
@@ -394,64 +401,64 @@ export default function App() {
       {/* ------------------------------------------------------------------- */}
       {/* 1. AUTHENTICATION LOGIN PAGE SCREEN */}
       {/* ------------------------------------------------------------------- */}
-      {!isLoggedIn ? (
-        <div className="flex-1 flex flex-col md:flex-row min-h-screen bg-slate-100">
+      {activeTab === 'login' && !isLoggedIn ? (
+        <div className="flex-1 flex flex-col md:flex-row min-h-screen bg-slate-100 animate-in fade-in duration-200">
           
-          {/* Brand Left Section (Decorative) */}
-          <div className="flex-1 bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900 text-white flex flex-col justify-between p-10 md:p-16 relative overflow-hidden">
+          {/* Brand Left Section (Decorative) - Compacted as requested */}
+          <div className="flex-1 bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900 text-white flex flex-col justify-between p-7 md:p-10 relative overflow-hidden">
             <div className="absolute right-0 top-0 bottom-0 left-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
             
-            <div className="flex items-center gap-3 relative z-10">
-              <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md text-white border border-white/15 shadow-lg">
-                <Server className="w-8 h-8" />
+            <div className="flex items-center gap-2.5 relative z-10">
+              <div className="p-2 rounded-xl bg-white/10 backdrop-blur-sm text-white border border-white/15 shadow-sm">
+                <Server className="w-5.5 h-5.5" />
               </div>
               <div>
-                <h1 className="text-lg font-black tracking-wider leading-none">LAB INFORMATIKA</h1>
-                <span className="text-xs text-blue-300 font-bold tracking-tight uppercase">SMAN 1 Teluk Kuantan</span>
+                <h1 className="text-sm font-black tracking-wider leading-none">LAB INFORMATIKA</h1>
+                <span className="text-[9px] text-blue-300 font-bold tracking-tight uppercase">SMAN 1 Teluk Kuantan</span>
               </div>
             </div>
 
-            <div className="space-y-4 max-w-lg mt-12 md:mt-0 relative z-10">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-xs font-bold border border-white/20">
-                <Award className="w-4 h-4 text-amber-400" /> SMAN 1 Unggul & Berprestasi
+            <div className="space-y-3.5 max-w-sm mt-8 md:mt-0 relative z-10">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white/10 rounded-full text-[9px] font-extrabold border border-white/15 tracking-wide text-amber-300">
+                <Award className="w-3 h-3 text-amber-300" /> SMAN 1 Unggul & Berprestasi
               </span>
-              <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+              <h2 className="text-xl md:text-2xl font-black tracking-tight leading-tight text-white">
                 Sistem Informasi Inventaris Laboratorium
               </h2>
-              <p className="text-indigo-100/90 text-sm leading-relaxed">
+              <p className="text-indigo-100/80 text-[11px] leading-relaxed">
                 Pendataan terintegrasi, pemantauan kelayakan hardware laptop, workstation PC, Interactive Smartboard, dan infrastruktur jaringan lab secara real-time.
               </p>
             </div>
 
-            <div className="text-xs text-indigo-200/60 font-medium mt-12 md:mt-0 relative z-10">
-              © 2026 RahmatApriono • Sistem Inventaris Labor Informatika SMAN 1 Teluk Kuantan
+            <div className="text-[9px] text-indigo-200/50 font-bold mt-8 md:mt-0 relative z-10 uppercase tracking-wider">
+              © 2026 RahmatApriono • SMAN 1 Teluk Kuantan
             </div>
           </div>
 
           {/* Login Form Right Section */}
-          <div className="w-full md:w-[480px] bg-white flex flex-col justify-center px-8 py-12 md:p-12 shadow-2xl relative z-10">
-            <div className="max-w-md w-full mx-auto space-y-8">
+          <div className="w-full md:w-[450px] bg-white flex flex-col justify-center px-8 py-10 md:p-10 shadow-2xl relative z-10">
+            <div className="max-w-md w-full mx-auto space-y-6">
               
               <div>
-                <span className="text-xs font-extrabold text-blue-600 uppercase tracking-widest block">ADMIN LOGIN PORTAL</span>
-                <h3 className="text-2xl font-black text-slate-800 tracking-tight mt-1">Selamat Datang</h3>
-                <p className="text-xs text-slate-400 mt-1">Silakan masukkan username dan sandi akses labor SMAN 1 Anda.</p>
+                <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest block">ADMIN LOGIN PORTAL</span>
+                <h3 className="text-xl font-black text-slate-800 tracking-tight mt-1">Selamat Datang</h3>
+                <p className="text-[11px] text-slate-400 mt-1">Silakan masukkan username dan sandi akses labor SMAN 1 Anda.</p>
               </div>
 
               {loginError && (
-                <div className="p-3.5 bg-rose-50 border border-rose-150 rounded-xl text-rose-700 text-xs font-medium flex items-center gap-2.5">
-                  <AlertCircle className="w-4.5 h-4.5 text-rose-500 shrink-0" />
+                <div className="p-3 bg-rose-50 border border-rose-150 rounded-xl text-rose-700 text-xs font-medium flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
                   <span>{loginError}</span>
                 </div>
               )}
 
-              <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
+              <form onSubmit={handleLoginSubmit} className="space-y-3.5 text-xs">
                 
                 {/* Username */}
                 <div className="space-y-1">
                   <label className="block text-slate-700 font-bold">Username Akun</label>
                   <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                       <User className="w-4 h-4" />
                     </span>
                     <input 
@@ -459,7 +466,7 @@ export default function App() {
                       placeholder="Masukkan username (contoh: admin)"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 pl-10 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-slate-50/50"
+                      className="w-full rounded-xl border border-slate-200 pl-9 pr-4 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-slate-50/50"
                       required
                     />
                   </div>
@@ -471,7 +478,7 @@ export default function App() {
                     <label className="block text-slate-700 font-bold">Kata Sandi</label>
                   </div>
                   <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                       <Lock className="w-4 h-4" />
                     </span>
                     <input 
@@ -479,48 +486,57 @@ export default function App() {
                       placeholder="Masukkan kata sandi"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 pl-10 pr-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-slate-50/50"
+                      className="w-full rounded-xl border border-slate-200 pl-9 pr-4 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-slate-50/50"
                       required
                     />
                   </div>
                 </div>
 
-                <button 
-                  type="submit"
-                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl shadow-md shadow-blue-600/10 hover:shadow-lg transition-all"
-                >
-                  Masuk Aplikasi
-                </button>
+                <div className="space-y-2 pt-1">
+                  <button 
+                    type="submit"
+                    className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl shadow-md shadow-blue-600/10 hover:shadow-lg transition-all"
+                  >
+                    Masuk Aplikasi
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => setActiveTab('dashboard')}
+                    className="w-full py-2.5 bg-slate-100 hover:bg-slate-150 text-slate-600 font-bold rounded-xl transition-all border border-slate-200"
+                  >
+                    Batal, Akses Tamu
+                  </button>
+                </div>
 
               </form>
 
               {/* DEMO ACCOUNTS QUICK SWITCH (Highly recommended for examiner ease of testing!) */}
-              <div className="border-t border-slate-100 pt-6 space-y-3">
-                <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Akun Demo Cepat (Klik untuk Masuk):</span>
+              <div className="border-t border-slate-100 pt-5 space-y-2.5">
+                <span className="block text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Akun Demo Cepat (Klik untuk Masuk):</span>
                 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-1.5">
                   <button
                     onClick={() => handleQuickLogin('Administrator')}
-                    className="p-2.5 rounded-xl border border-blue-100 bg-blue-50/30 hover:bg-blue-50 text-slate-700 hover:border-blue-300 transition-all text-center space-y-0.5 group"
+                    className="p-2 rounded-xl border border-blue-100 bg-blue-50/30 hover:bg-blue-50 text-slate-700 hover:border-blue-300 transition-all text-center space-y-0.5 group"
                   >
-                    <span className="block text-[10px] font-bold text-blue-700">Administrator</span>
-                    <span className="block text-[8px] text-slate-400">admin / admin123</span>
+                    <span className="block text-[9px] font-extrabold text-blue-700 leading-tight">Admin</span>
+                    <span className="block text-[7px] text-slate-400 leading-none">admin / admin123</span>
                   </button>
 
                   <button
                     onClick={() => handleQuickLogin('Teknisi Labor')}
-                    className="p-2.5 rounded-xl border border-emerald-100 bg-emerald-50/30 hover:bg-emerald-50 text-slate-700 hover:border-emerald-300 transition-all text-center space-y-0.5 group"
+                    className="p-2 rounded-xl border border-emerald-100 bg-emerald-50/30 hover:bg-emerald-50 text-slate-700 hover:border-emerald-300 transition-all text-center space-y-0.5 group"
                   >
-                    <span className="block text-[10px] font-bold text-emerald-700">Teknisi Lab</span>
-                    <span className="block text-[8px] text-slate-400">teknisi / teknisi123</span>
+                    <span className="block text-[9px] font-extrabold text-emerald-700 leading-tight">Teknisi</span>
+                    <span className="block text-[7px] text-slate-400 leading-none">teknisi / teknisi123</span>
                   </button>
 
                   <button
                     onClick={() => handleQuickLogin('Kepala Labor')}
-                    className="p-2.5 rounded-xl border border-amber-100 bg-amber-50/30 hover:bg-amber-50 text-slate-700 hover:border-amber-300 transition-all text-center space-y-0.5 group"
+                    className="p-2 rounded-xl border border-amber-100 bg-amber-50/30 hover:bg-amber-50 text-slate-700 hover:border-amber-300 transition-all text-center space-y-0.5 group"
                   >
-                    <span className="block text-[10px] font-bold text-amber-700">Kepala Lab</span>
-                    <span className="block text-[8px] text-slate-400">kepalalab / kepalalab123</span>
+                    <span className="block text-[9px] font-extrabold text-amber-700 leading-tight">Kepala Lab</span>
+                    <span className="block text-[7px] text-slate-400 leading-none">kepalalab / kepalalab123</span>
                   </button>
                 </div>
               </div>
@@ -625,7 +641,7 @@ export default function App() {
                 © 2026 <strong className="text-slate-600 font-bold">RahmatApriono</strong>. SMAN 1 Teluk Kuantan. All rights reserved.
               </div>
               <div className="text-slate-400 font-bold block tracking-tight uppercase">
-                "Sistem Inventaris Labor Informatika SMAN 1 Teluk Kuantan"
+                "SILISA (Sistem Inventaris Labor Informatika SMANSA)"
               </div>
             </footer>
 

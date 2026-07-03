@@ -34,11 +34,11 @@ export default function Sidebar({
 }: SidebarProps) {
   
   const menuItems = [
-    { id: 'dashboard', name: 'Dashboard', icon: Home, roles: ['Administrator', 'Teknisi Labor', 'Kepala Labor'] },
-    { id: 'inventaris', name: 'Data Inventaris', icon: Database, roles: ['Administrator', 'Teknisi Labor', 'Kepala Labor'] },
+    { id: 'dashboard', name: 'Dashboard', icon: Home, roles: ['Administrator', 'Teknisi Labor', 'Kepala Labor', 'Tamu'] },
+    { id: 'inventaris', name: 'Data Inventaris', icon: Database, roles: ['Administrator', 'Teknisi Labor', 'Kepala Labor', 'Tamu'] },
     { id: 'form', name: 'Tambah Inventaris', icon: PlusCircle, roles: ['Administrator', 'Teknisi Labor'] },
     { id: 'perbaikan', name: 'Perbaikan Perangkat', icon: Wrench, roles: ['Administrator', 'Teknisi Labor'] },
-    { id: 'laporan', name: 'Laporan', icon: FileText, roles: ['Administrator', 'Teknisi Labor', 'Kepala Labor'] },
+    { id: 'laporan', name: 'Laporan', icon: FileText, roles: ['Administrator', 'Teknisi Labor', 'Kepala Labor', 'Tamu'] },
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(currentUserRole));
@@ -48,6 +48,7 @@ export default function Sidebar({
       case 'Administrator': return 'bg-blue-50 text-blue-700 border-blue-100';
       case 'Teknisi Labor': return 'bg-emerald-50 text-emerald-700 border-emerald-100';
       case 'Kepala Labor': return 'bg-amber-50 text-amber-700 border-amber-100';
+      case 'Tamu': return 'bg-slate-100 text-slate-600 border-slate-200';
       default: return 'bg-slate-50 text-slate-700 border-slate-100';
     }
   };
@@ -90,14 +91,20 @@ export default function Sidebar({
           <div className="flex items-center gap-3">
             <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
               <User className="w-5 h-5" />
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white" />
+              <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border border-white ${currentUserRole === 'Tamu' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="text-xs font-bold text-slate-900 truncate" title={currentUserRole === 'Administrator' ? 'Rahmat Apriono' : currentUserRole}>
-                {currentUserRole === 'Administrator' ? 'Rahmat Apriono' : currentUserRole === 'Teknisi Labor' ? 'Hendra (Teknisi)' : 'Kepala Lab (Bapak Siswo)'}
+              <p className="text-xs font-bold text-slate-900 truncate" title={currentUserRole === 'Tamu' ? 'Tamu / Kepala Sekolah' : currentUserRole}>
+                {currentUserRole === 'Tamu' 
+                  ? 'Kepala Sekolah / Tamu' 
+                  : currentUserRole === 'Administrator' 
+                    ? 'Rahmat Apriono' 
+                    : currentUserRole === 'Teknisi Labor' 
+                      ? 'Hendra (Teknisi)' 
+                      : 'Kepala Lab (Bapak Siswo)'}
               </p>
               <span className={`inline-block text-[10px] px-2 py-0.5 mt-1 rounded-full border font-bold ${getRoleBadgeColor(currentUserRole)}`}>
-                {currentUserRole}
+                {currentUserRole === 'Tamu' ? 'Akses Tamu' : currentUserRole}
               </span>
             </div>
           </div>
@@ -136,15 +143,28 @@ export default function Sidebar({
           })}
         </nav>
 
-        {/* Sidebar Footer / Logout */}
+        {/* Sidebar Footer / Logout or Login */}
         <div className="p-4 border-t border-slate-100">
-          <button
-            onClick={onLogout}
-            className="flex items-center justify-center w-full gap-2 px-4 py-2.5 text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 rounded-xl hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-200"
-          >
-            <LogOut className="w-4 h-4" />
-            Keluar Sistem
-          </button>
+          {currentUserRole === 'Tamu' ? (
+            <button
+              onClick={() => {
+                setActiveTab('login');
+                setIsOpen(false);
+              }}
+              className="flex items-center justify-center w-full gap-2 px-4 py-2.5 text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200"
+            >
+              <Shield className="w-4 h-4" />
+              Masuk Sistem (Login)
+            </button>
+          ) : (
+            <button
+              onClick={onLogout}
+              className="flex items-center justify-center w-full gap-2 px-4 py-2.5 text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 rounded-xl hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-200"
+            >
+              <LogOut className="w-4 h-4" />
+              Keluar Sistem
+            </button>
+          )}
           
           <div className="mt-4 text-center">
             <p className="text-[10px] text-slate-450 font-semibold font-sans">
