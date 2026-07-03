@@ -1,0 +1,6 @@
+{
+  "name": "Sistem Inventaris Labor Informatika SMAN 1 Teluk Kuantan",
+  "description": "Sistem informasi pengelolaan inventaris perangkat laboratorium komputer SMAN 1 Teluk Kuantan untuk pendataan, monitoring kondisi, dan riwayat perbaikan perangkat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
